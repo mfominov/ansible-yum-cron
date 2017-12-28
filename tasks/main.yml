@@ -1,0 +1,22 @@
+---
+
+- name: Install yum-cron
+  yum: 
+    name: yum-cron
+    state: present
+
+- name: apply updates
+  become: yes
+  lineinfile:
+    path: /etc/yum/yum-cron.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: "^apply_updates ", line: "apply_updates = yes" }
+    - { regexp: "^update_cmd ", line: "update_cmd = {{ update_cmd }}" }
+
+- name: start and enable yum-cron service
+  systemd:
+    name: yum-cron
+    state: started
+    enabled: true
